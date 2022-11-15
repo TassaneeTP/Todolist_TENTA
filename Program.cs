@@ -1,4 +1,9 @@
-﻿namespace dtp15_todolist
+﻿using static dtp15_todolist.Todo;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
+namespace dtp15_todolist
 {
     public class Todo
     {
@@ -7,6 +12,7 @@
         public const int Active = 1;
         public const int Waiting = 2;
         public const int Ready = 3;
+        public const int Done = 4;
         public static string StatusToString(int status)
         {
             switch (status)
@@ -14,6 +20,7 @@
                 case Active: return "aktiv";
                 case Waiting: return "väntande";
                 case Ready: return "avklarad";
+                case Done: return "klar";
                 default: return "(felaktig)";
             }
         }
@@ -23,12 +30,12 @@
             public int priority;
             public string task;
             public string taskDescription;
-            public TodoItem(int priority, string task)
+            public TodoItem(int priority, string task, string taskDescription)
             {
                 this.status = Active;
                 this.priority = priority;
                 this.task = task;
-                this.taskDescription = "";
+                this.taskDescription = taskDescription;
             }
             public TodoItem(string todoLine)
             {
@@ -46,7 +53,8 @@
                     Console.WriteLine($"{taskDescription,-40}|");
                 else
                     Console.WriteLine();
-            }
+            } 
+           
         }
         public static void ReadListFromFile()
         {
@@ -84,6 +92,7 @@
         private static void PrintFoot(bool verbose)
         {
             PrintHeadOrFoot(head: false, verbose);
+
         }
         public static void PrintTodoList(bool verbose = false)
         {
@@ -94,12 +103,28 @@
             }
             PrintFoot(verbose);
         }
+        public static void PrintTodoList2(bool verbose = false, int S = 0)
+        {
+            PrintHead(verbose);
+            foreach (TodoItem item in list)
+            {
+                if(S == 0) { item.Print(verbose); }
+                else if(item.status == S) { item.Print(verbose); }
+                
+            }
+            PrintFoot(verbose);
+        }
+
         public static void PrintHelp()
         {
             Console.WriteLine("Kommandon:");
-            Console.WriteLine("hjälp    lista denna hjälp");
-            Console.WriteLine("lista    lista att-göra-listan");
-            Console.WriteLine("sluta    spara att-göra-listan och sluta");
+            Console.WriteLine("hjälp        lista denna hjälp");
+            Console.WriteLine("ny           skapa en ny lista");
+            Console.WriteLine("lista        lista att-göra-listan");
+            Console.WriteLine("Lista allt   lista alla att-göra-listan");
+            Console.WriteLine("beskriv      lista alla active att-göra-listan");
+            Console.WriteLine("klar         lista klar uppgifte");
+            Console.WriteLine("sluta        spara att-göra-listan och sluta");
         }
     }
     class MainClass
@@ -117,6 +142,33 @@
                 {
                     Todo.PrintHelp();
                 }
+                else if (MyIO.Equals(command, "ny"))
+                {
+                    Console.Write("Uppgiftens namn: ");
+                    string task = Console.ReadLine();
+                    Console.Write("Prioritet: ");
+                    int prio = Int32.Parse(Console.ReadLine());
+                    Console.Write("Beskrivning: ");
+                    string beskrivning = Console.ReadLine();
+                    TodoItem item = new TodoItem(prio, task, beskrivning);
+                    list.Add(item);
+                    Console.WriteLine($"Sparad!");
+
+                }
+                else if(MyIO.Equals(command, "beskriv"))
+                {
+                    Todo.PrintTodoList2(verbose: true, 1);
+                    
+                }
+                else if(MyIO.Equals(command, "klar"))
+                {
+                    string status = Todo.StatusToString(0);
+                    TodoItem item = new TodoItem(status);
+                    list.Add(item);
+                    //File.WriteAllText(@"todo.lis", status);
+                    PrintTodoList2(verbose: true, 4);
+
+                }
                 else if (MyIO.Equals(command, "sluta"))
                 {
                     Console.WriteLine("Hej då!");
@@ -125,9 +177,9 @@
                 else if (MyIO.Equals(command, "lista"))
                 {
                     if (MyIO.HasArgument(command, "allt"))
-                        Todo.PrintTodoList(verbose: true);
-                    else
                         Todo.PrintTodoList(verbose: false);
+                    else
+                        Todo.PrintTodoList2(verbose: false, 1);
                 }
                 else
                 {
