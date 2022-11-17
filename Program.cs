@@ -125,7 +125,9 @@ namespace dtp15_todolist
             Console.WriteLine("lista        lista att-göra-listan");
             Console.WriteLine("Lista allt   lista alla att-göra-listan");
             Console.WriteLine("beskriv      lista alla active att-göra-listan");
-            Console.WriteLine("klar         lista klar uppgifte");
+            Console.WriteLine("klar         lista klar uppgifter");
+            Console.WriteLine("aktivera     lista aktiv uppgifter");
+            Console.WriteLine("vänta        lista väntande uppgifter");
             Console.WriteLine("sluta        spara att-göra-listan och sluta");
         }
     }
@@ -185,8 +187,11 @@ namespace dtp15_todolist
                 }
                 else if (MyIO.Equals(command[0], "sluta"))
                 {
+                        
+             
                     Console.WriteLine("Hej då!");
                     break;
+                   
                 }
                 else if (MyIO.Equals(command[0], "lista"))
                 {
@@ -197,7 +202,7 @@ namespace dtp15_todolist
                 }
                 else
                 {
-                    Console.WriteLine($"Okänt kommando: {command}");
+                    Console.WriteLine($"Okänt kommando: {command[0]}");
                 }
             }
             while (true);
