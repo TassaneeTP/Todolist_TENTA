@@ -114,6 +114,8 @@ namespace dtp15_todolist
             }
             PrintFoot(verbose);
         }
+        
+        
 
         public static void PrintHelp()
         {
@@ -134,15 +136,15 @@ namespace dtp15_todolist
             Console.WriteLine("Välkommen till att-göra-listan!");
             Todo.ReadListFromFile();
             Todo.PrintHelp();
-            string command;
+            string[] command;
             do
             {
-                command = MyIO.ReadCommand("> ");
-                if (MyIO.Equals(command, "hjälp"))
+                command = MyIO.ReadCommand();
+                if (MyIO.Equals(command[0], "hjälp"))
                 {
                     Todo.PrintHelp();
                 }
-                else if (MyIO.Equals(command, "ny"))
+                else if (MyIO.Equals(command[0], "ny"))
                 {
                     Console.Write("Uppgiftens namn: ");
                     string task = Console.ReadLine();
@@ -155,31 +157,43 @@ namespace dtp15_todolist
                     Console.WriteLine($"Sparad!");
 
                 }
-                else if(MyIO.Equals(command, "beskriv"))
+                else if (MyIO.Equals(command[0], "beskriv"))
                 {
                     Todo.PrintTodoList2(verbose: true, 1);
                     
                 }
-                else if(MyIO.Equals(command, "klar"))
+                else if (MyIO.Equals(command[0], "klar"))
                 {
-                    string status = Todo.StatusToString(0);
-                    TodoItem item = new TodoItem(status);
-                    list.Add(item);
-                    //File.WriteAllText(@"todo.lis", status);
-                    PrintTodoList2(verbose: true, 4);
+                    foreach (TodoItem item in list)
+                        if (item.task == command[1])
+                            item.status = Ready;
 
                 }
-                else if (MyIO.Equals(command, "sluta"))
+                else if (MyIO.Equals(command[0], "vänta"))
+                {
+                    foreach (TodoItem item in list)
+                        if (item.task == command[1])
+                            item.status = Waiting;
+
+                }
+                else if (MyIO.Equals(command[0], "aktivera"))
+                {
+                    foreach (TodoItem item in list)
+                        if (item.task == command[1])
+                            item.status = Active;
+
+                }
+                else if (MyIO.Equals(command[0], "sluta"))
                 {
                     Console.WriteLine("Hej då!");
                     break;
                 }
-                else if (MyIO.Equals(command, "lista"))
+                else if (MyIO.Equals(command[0], "lista"))
                 {
-                    if (MyIO.HasArgument(command, "allt"))
-                        Todo.PrintTodoList(verbose: false);
-                    else
+                    if (command.Length < 2)
                         Todo.PrintTodoList2(verbose: false, 1);
+                    else if (command[1] == "allt")
+                        Todo.PrintTodoList(verbose: false);
                 }
                 else
                 {
@@ -191,10 +205,16 @@ namespace dtp15_todolist
     }
     class MyIO
     {
-        static public string ReadCommand(string prompt)
+        static public string[] ReadCommand()
         {
-            Console.Write(prompt);
-            return Console.ReadLine();
+            Console.Write("> ");
+            string command = Convert.ToString(Console.ReadLine());
+            string[] commandlist = command.Trim().Split(" ");
+            if (commandlist.Length == 3)
+            {
+                commandlist[1] = commandlist[1] + " " + commandlist[2];
+            }
+            return commandlist;
         }
         static public bool Equals(string rawCommand, string expected)
         {
