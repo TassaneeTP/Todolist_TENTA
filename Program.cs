@@ -187,8 +187,16 @@ namespace dtp15_todolist
                 }
                 else if (MyIO.Equals(command[0], "sluta"))
                 {
-                        
-             
+                    string todoFileName = "todo.lis";
+                    using (TextWriter sw = new StreamWriter(todoFileName))
+                    {
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            string line = $"{list[i].status}|{list[i].priority}|{list[i].task}|{list[i].taskDescription}";
+                            sw.WriteLine(line);
+                            
+                        }
+                    }
                     Console.WriteLine("Hej då!");
                     break;
                    
